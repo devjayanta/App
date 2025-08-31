@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background: #f4f8fb;
+        }
+
+        .navbar {
+            background: #2c3e50;
+        }
+
+        .navbar-brand,
+        .nav-link {
+            color: white !important;
+        }
+
+        .container-box {
+            background: white;
+            padding: 30px;
+            margin-top: 50px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg px-4">
+        <a class="navbar-brand" href="#">Quiz Portal</a>
+        <div class="ms-auto">
+            <span class="text-white me-3">Welcome, {{ request.user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="container-box">
+            <h3 class="text-center mb-4">Take a Quiz</h3>
+
+            <form method="get" id="quizForm">
+                <div class="mb-3">
+                    <label class="form-label">Select Subject</label>
+                    <select id="subjectSelect" class="form-select" required>
+                        <option value="">-- Choose Subject --</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select Chapter</label>
+                    <select id="chapterSelect" class="form-select" required disabled>
+                        <option value="">-- Choose Chapter --</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Take Quiz</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#subjectSelect").change(function () {
+                let subjectId = $(this).val();
+                if (subjectId) {
+                    $.ajax({
+                        url: "/get-chapters/" + subjectId + "/",
+                        method: "GET",
+                        success: function (data) {
+                            $("#chapterSelect").prop("disabled", false);
+                            $("#chapterSelect").empty().append('<option value="">-- Choose Chapter --</option>');
+                            data.forEach(function (ch) {
+                                $("#chapterSelect").append('<option value="' + ch.id + '">' + ch.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $("#chapterSelect").prop("disabled", true).empty().append('<option value="">-- Choose Chapter --</option>');
+                }
+            });
+
+            $("#quizForm").submit(function (e) {
+                e.preventDefault();
+                let subjectId = $("#subjectSelect").val();
+                let chapterId = $("#chapterSelect").val();
+                if (subjectId && chapterId) {
+                    window.location.href = "/quiz/" + subjectId + "/" + chapterId + "/start/";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

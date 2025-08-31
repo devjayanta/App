@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{ subject.name }} — {{ chapter.name }} | Result</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+  <div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3>Result: {{ subject.name }} → {{ chapter.name }}</h3>
+      <a class="btn btn-outline-primary" href="{% url 'student_dashboard' %}">Back to Dashboard</a>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="text-muted">Total Questions</div>
+            <div class="display-6">{{ attempt.total_questions }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="text-muted">Attempted</div>
+            <div class="display-6">{{ attempt.attempted }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="text-muted">Correct</div>
+            <div class="display-6 text-success">{{ attempt.correct }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="text-muted">Wrong</div>
+            <div class="display-6 text-danger">{{ attempt.wrong }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="mb-3">Your Answers</h5>
+        <ol class="list-group list-group-numbered">
+          {% for a in answers %}
+          <li class="list-group-item">
+            {% if a.question.text %}<div class="fw-semibold">{{ a.question.text }}</div>{% endif %}
+            {% if a.question.image %}<img src="{{ a.question.image.url }}" class="img-fluid my-2"
+              style="max-width:320px">{% endif %}
+
+            <div class="mt-2">
+              <span class="me-2">Your Answer:</span>
+              {% if a.selected_option %}
+              <span class="{% if a.is_correct %}text-success{% else %}text-danger{% endif %}">
+                {{ a.selected_option.text }}
+              </span>
+              {% if a.selected_option.image %}
+              <div><img src="{{ a.selected_option.image.url }}" style="max-width:220px"></div>
+              {% endif %}
+              {% else %}
+              <em class="text-muted">Not answered</em>
+              {% endif %}
+            </div>
+
+            {% if not a.is_correct and a.correct_option %}
+            <div class="mt-1">
+              <small class="text-muted">Correct option:
+                {{ a.correct_option.text }}
+                {% if a.correct_option.image %}
+                <div><img src="{{ a.correct_option.image.url }}" style="max-width:220px"></div>
+                {% endif %}
+              </small>
+            </div>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
